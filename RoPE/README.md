@@ -50,46 +50,51 @@ Transformer 的 self-attention 本身是**排列不变的（permutation invarian
 
 ### 2.1 从 2D 旋转说起
 
-假设有一个 2D 向量 $[a, b]$，逆时针旋转角度 $\theta$：
+假设有一个 2D 向量 `[a, b]`，逆时针旋转角度 `theta`：
 
-$$
-\begin{bmatrix} a' \\ b' \end{bmatrix} = \begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix} \begin{bmatrix} a \\ b \end{bmatrix}
-$$
+```
+[a']   [ cos(theta)  -sin(theta) ] [a]
+[b'] = [ sin(theta)   cos(theta) ] [b]
+```
 
-用复数来表示更简洁：$(a + jb) \times e^{j\theta} = (a + jb) \times (\cos\theta + j\sin\theta)$
+用复数来表示更简洁：
+
+```
+(a + jb) * e^(j*theta) = (a + jb) * (cos(theta) + j*sin(theta))
+```
 
 ### 2.2 RoPE 的做法
 
-对于维度为 $d$ 的 query 向量，RoPE 把它拆成 $d/2$ 对：
+对于维度为 `d` 的 query 向量，RoPE 把它拆成 `d/2` 对：
 
-$$
-q = [q_0, q_1 \mid q_2, q_3 \mid \ldots \mid q_{d-2}, q_{d-1}]
-$$
+```
+q = [q_0, q_1 | q_2, q_3 | ... | q_{d-2}, q_{d-1}]
+```
 
-每一对 $(q_{2i}, q_{2i+1})$ 被旋转一个角度 $m \cdot \theta_i$，其中：
-- $m$ = token 的位置索引（0, 1, 2, ...）
-- $\theta_i = \frac{1}{10000^{2i/d}}$ = 第 $i$ 个维度对的基础频率
+每一对 `(q_{2i}, q_{2i+1})` 被旋转一个角度 `m * theta_i`，其中：
+- `m` = token 的位置索引（0, 1, 2, ...）
+- `theta_i = 1 / (10000^(2i/d))` = 第 `i` 个维度对的基础频率
 
 ### 2.3 为什么这样能编码"相对位置"？
 
 关键定理（不需要证明，但理解直觉）：
 
-$$
-\langle R_m q, R_n k \rangle = \langle R_{m-n} q, k \rangle
-$$
+```
+<R_m * q, R_n * k> = <R_{m-n} * q, k>
+```
 
-旋转后的 q 和 k 的内积，只取决于它们的**位置差 $m-n$**，而不是绝对位置。
+旋转后的 q 和 k 的内积，只取决于它们的**位置差 `m - n`**，而不是绝对位置。
 
-**直觉**：旋转是正交变换。两个向量之间的"相对旋转角度"决定了它们的内积，而相对旋转角度恰好是 $(m-n) \cdot \theta_i$。
+**直觉**：旋转是正交变换。两个向量之间的"相对旋转角度"决定了它们的内积，而相对旋转角度恰好是 `(m-n) * theta_i`。
 
 ### 2.4 多尺度频率的设计
 
-$$
-\theta_i = \frac{1}{10000^{2i/d}}, \quad i = 0, 1, \ldots, d/2 - 1
-$$
+```
+theta_i = 1 / (10000^(2i/d)),   i = 0, 1, ..., d/2 - 1
+```
 
-- **$i = 0$（低维）**：$\theta_0 = 1$，旋转最快 → 对**近距离**关系敏感
-- **$i = d/2-1$（高维）**：$\theta$ 非常小，旋转很慢 → 对**远距离**关系敏感
+- **`i = 0`（低维）**：`theta_0 = 1`，旋转最快 → 对**近距离**关系敏感
+- **`i = d/2-1`（高维）**：`theta` 非常小，旋转很慢 → 对**远距离**关系敏感
 
 这类似于傅里叶变换的多频率分析！
 
@@ -129,14 +134,14 @@ class RoPE(nn.Module):
 
 ### 4.1 思路
 
-需要为每个 (位置, 维度对) 计算旋转因子 $e^{j \cdot m \cdot \theta_i}$
+需要为每个 (位置, 维度对) 计算旋转因子 `e^(j * m * theta_i)`
 
 ### 4.2 实现步骤
 
 ```python
 def precompute_freqs_cis(dim, max_seq_len, theta=10000.0):
     # 步骤 1: 计算每个维度对的基础频率
-    #   θ_i = 1 / (theta^{2i/dim})
+    #   theta_i = 1 / (theta^{2i/dim})
     #   技巧: 用 arange(0, dim, 2) 生成 [0, 2, 4, ...]
     freqs = 1.0 / (theta ** (torch.arange(0, dim, 2).float() / dim))
     # shape: (dim // 2,)
@@ -149,7 +154,7 @@ def precompute_freqs_cis(dim, max_seq_len, theta=10000.0):
     angles = torch.outer(positions, freqs)
     # shape: (max_seq_len, dim // 2)
     
-    # 步骤 4: 转为复数旋转因子 e^{j·angle}
+    # 步骤 4: 转为复数旋转因子 e^{j*angle}
     freqs_cis = torch.polar(torch.ones_like(angles), angles)
     # shape: (max_seq_len, dim // 2), dtype=complex64
     
@@ -267,10 +272,10 @@ assert torch.allclose(norm_before, norm_after, atol=1e-5)
 
 ```python
 # 固定 q 和 k，放在不同绝对位置但保持相同相对距离
-# 验证 q^T·k 的值相同
+# 验证 q^T * k 的值相同
 ```
 
-**原理**：$\langle R_m q, R_n k \rangle$ 只取决于 $m - n$。
+**原理**：`<R_m * q, R_n * k>` 只取决于 `m - n`。
 
 ### 验证 3：旋转矩阵等价性
 
@@ -287,11 +292,11 @@ assert torch.allclose(norm_before, norm_after, atol=1e-5)
 ### 🔑 必须记住的核心公式
 
 ```
-θ_i = 1 / (10000^{2i/d})
+theta_i = 1 / (10000^(2i/d))
 
-旋转因子 = e^{j·m·θ_i} = cos(m·θ_i) + j·sin(m·θ_i)
+旋转因子 = e^(j*m*theta_i) = cos(m*theta_i) + j*sin(m*theta_i)
 
-应用方式：(q_{2i} + j·q_{2i+1}) × 旋转因子
+应用方式：(q_{2i} + j*q_{2i+1}) × 旋转因子
 ```
 
 ### 🔑 必须理解的关键 API
