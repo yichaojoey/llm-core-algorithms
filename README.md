@@ -11,6 +11,15 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
 
 ## 🧠 Covered Algorithms
 
+### [Supervised Fine-Tuning & PEFT]
+1. **[SFT_Loss](./SFT/SFT_Loss/)**: Causal LM offset targeting and Negative-100 logic.
+2. **[LoRA](./SFT/LoRA/)**: Core Low-Rank Adaptation theory with matrix $B$ zero-initialization.
+3. **[AdaLoRA](./SFT/AdaLoRA/)**: SVD-based adaptive importance evaluation with zero-gradient deadlock evasion.
+4. **[QLoRA](./SFT/QLoRA/)**: Block-wise quantization memory advantages and on-the-fly computational limits.
+5. **[LORA-COMPARISON Guide](./SFT/LORA-COMPARISON.md)**: Deep dive code walkthrough for the LoRA variants.
+
+### [Reinforcement Learning & Alignment]
+
 ### 1. [RoPE (Rotary Position Embedding)](./RoPE/)
 The cornerstone positional encoding mechanism for modern LLMs (LLaMA, Qwen, Mistral). Demonstrates multi-dimensional complex number representation to encode sequence relative distances geometrically smoothly.
 
