@@ -31,6 +31,10 @@
   - **What**: 组装工厂横向拉通 [llama3_1_block.py](./Pretraining/Decoder_Block_Zoo/llama3_1_block.py)、[qwen2_5_block.py](./Pretraining/Decoder_Block_Zoo/qwen2_5_block.py) 和 [deepseek_v3_block.py](./Pretraining/Decoder_Block_Zoo/deepseek_v3_block.py)。
   - **Why**: 极有高度的顶峰提问！你需要像背家谱一样当面白板拆穿三家设计的哲学分水岭：LLaMA 为什么打死不用 QKV bias 偏置（死保尺度平移不变性和后期完美量化），Qwen 为什么违背常理死死加上偏置（给位置提供特定微量常数锚点解决局部乱码），以及 DeepSeek 到底是个什么怪物组合（上半身切装 MLA 压碎长程 KV 缓存显存，下半身切换 MoE 避开高密度庞大计算）的完整拼图！
 
+- **第六天：睁眼看世界的引爆点 (多模态 VLM)**
+  - **What**: 强迫模型开眼的架构破圈 [vit_image_patching.py](./Pretraining/Multi_Modal_Vision_Language/vit_image_patching.py) 和 [cross_modal_projector.py](./Pretraining/Multi_Modal_Vision_Language/cross_modal_projector.py)。
+  - **Why**: 如今全人类都在卷多模态大一统！面试官极其爱刁钻提问：“你们的大模型参数怎么连通一个外部分离的图片编码器的？” 你不要背老旧笨重的交叉注意力（Cross-Attention）那一套，直接亮剑 **LLaVA 思想**：只需在原本架构外围搭建一个极度细微薄弱的【两层线性投影网 (MLP Projector)】，强行拉伸像素维度直接与文本拼接缝合（Concat），这是大象配狮子时代最高效降维的核心范式！
+
 ---
 
 ### 🟡 阶段二：打磨期 (微调对齐与平民卡极限利用)

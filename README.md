@@ -29,6 +29,9 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
    - **[LLaMA-3.1 Block](./Pretraining/Decoder_Block_Zoo/llama3_1_block.py)**: Absolute minimalist architecture avoiding any $Bias$ parameters maximizing Scale Invariance properties.
    - **[Qwen-2.5 Block](./Pretraining/Decoder_Block_Zoo/qwen2_5_block.py)**: Anchored bias injections fortifying spatial syntax tracking over MHA/GQA variations.
    - **[DeepSeek-V3 Block](./Pretraining/Decoder_Block_Zoo/deepseek_v3_block.py)**: Ultimate hybrid marrying top-half MLA bottlenecked Attention with bottom-half MoE dense-FFN computations minimizing peak theoretical requirements.
+7. **[Multi-Modal Vision-Language](./Pretraining/Multi_Modal_Vision_Language/)**:
+   - **[ViT Image Patching](./Pretraining/Multi_Modal_Vision_Language/vit_image_patching.py)**: Flattening 2D spatial pixel maps into sequence-compatible 1D token domains.
+   - **[LLaVA MLP Projector](./Pretraining/Multi_Modal_Vision_Language/cross_modal_projector.py)**: The disruptive bridge substituting massive Cross-Attention layers with brute-force linear translation forcing 1024-dim visual tokens into 4096-dim native embedding spaces mapped directly alongside text prompts.
 
 ### [Supervised Fine-Tuning & PEFT]
 1. **[SFT_Loss](./SFT/SFT_Loss/)**: Causal LM offset targeting and Negative-100 logic.
@@ -75,10 +78,6 @@ The sequence-level RLHF advancement introduced by the Qwen team. Shifts policy i
    - **[Tool Orchestration](./Application_Evaluation/Agentic_Coding_Harness/tool_orchestration_loop.py)**: Sandbox encapsulation and rigorous JSON/XML parameter executions blocking model chat escapes.
    - **[Viewport & AST Editing](./Application_Evaluation/Agentic_Coding_Harness/viewport_file_editor.py)**: Line-range partial reading and Diff editing avoiding global repository context crashes.
    - **[Bash Feedback Matrix](./Application_Evaluation/Agentic_Coding_Harness/bash_feedback_loop.py)**: Unsupervised Agent Self-Healing looping terminals tracebacks triggering cyclic autonomous code recoveries.
-
-## 📖 Deep Dives
-
-For an ultra-detailed, code-level breakdown on the structural differences and dimensional changes when putting these probabilistic LLM algorithms into practice, read the comprehensive [RL-COMPARISON Guide](./RL/RL-COMPARISON.md).
 
 ---
 
