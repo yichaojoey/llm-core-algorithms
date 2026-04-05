@@ -11,6 +11,12 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
 
 ## 🧠 Covered Algorithms
 
+### [Pretraining & Fundamental Architectures]
+1. **[RoPE (Rotary Position Embedding)](./Pretraining/RoPE/)**: The cornerstone positional encoding mechanism (LLaMA, Qwen, Mistral) showing relative geometric rotation offsets.
+2. **[Tokenizer Subword Rules](./Pretraining/Tokenizer/)**: Text mapping methodologies defining intelligence limits early on.
+   - **[BPE](./Pretraining/Tokenizer/BPE/)**: Absolute-Frequency bounded bindings establishing GPT sub-word behaviors.
+   - **[WordPiece](./Pretraining/Tokenizer/WordPiece/)**: Mutual-Information Likelihood fractionations preserving tightest word-pairings backing BERT designs.
+
 ### [Supervised Fine-Tuning & PEFT]
 1. **[SFT_Loss](./SFT/SFT_Loss/)**: Causal LM offset targeting and Negative-100 logic.
 2. **[LoRA](./SFT/LoRA/)**: Core Low-Rank Adaptation theory with matrix $B$ zero-initialization.
@@ -20,8 +26,6 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
 
 ### [Reinforcement Learning & Alignment]
 
-### 1. [RoPE (Rotary Position Embedding)](./RoPE/)
-The cornerstone positional encoding mechanism for modern LLMs (LLaMA, Qwen, Mistral). Demonstrates multi-dimensional complex number representation to encode sequence relative distances geometrically smoothly.
 
 ### 2. [REINFORCE (Vanilla Policy Gradient)](./RL/REINFORCE/)
 The grandparent of all probabilistic reinforcement alignment methods. Demonstrates reverse Markov discounted returns and the essential implementation of a Baseline value for mathematical variance stability.
