@@ -44,11 +44,11 @@
 **学习重点**：搞懂低显存魔法运转的极限数学压缩法则，而不是做只能敲启动脚本的“调包侠”。
 
 - **第七天：因果序列惩罚过滤 (SFT Loss Masking)**
-  - **What**: 研读 [sft_loss.py](./SFT/SFT_Loss/sft_loss.py)。
-  - **Why**: 面试如果连大模型自回归（右移预测错位匹配）都写不清晰直接淘汰！更深入的一步：你要回答在多轮对话拼图里，我们如何通过将不关心的引导提示语标定为特权码 `-100`，强制切断这边的反向传播，只惩罚模型答错的部分，做到算力和效果极度聚焦。
+  - **What**: 研读 [sft_loss.py](./SFT_PEFT/SFT_Loss/sft_loss.py) 与同级别的序列压缩术 [sequence_packing.py](./SFT_PEFT/Sequence_Packing/sequence_packing.py)。
+  - **Why**: 面试如果连大模型自回归（右移预测错位匹配）都写不清晰直接淘汰！你要回答在多轮对话拼图里，我们如何通过将不关心的引导提示语标定为特权码 `-100`，且引入块对角掩码 (Block-Diagonal Causal Mask) 解决 Padding 浪费做到算力和效果极度聚焦。
 
 - **第八天：降维分解重构流派 (LoRA Family)**
-  - **What**: 拉通对比 [lora.py](./SFT/LoRA/lora.py)、[adalora.py](./SFT/AdaLoRA/adalora.py) 和 [qlora.py](./SFT/QLoRA/qlora.py)，熟读专属对标大课 [LORA-COMPARISON.md](./SFT/LORA-COMPARISON.md)。
+  - **What**: 拉通对比 [lora.py](./SFT_PEFT/LoRA/lora.py)、[adalora.py](./SFT_PEFT/AdaLoRA/adalora.py) 和 [qlora.py](./SFT_PEFT/QLoRA/qlora.py)，熟读专属对标大课 [LORA-COMPARISON.md](./SFT_PEFT/LORA-COMPARISON.md)。
   - **Why**: 面试官必问：“秩 $r$ 和缩放因子 $\alpha$ 是怎么作用权重的？” 接着你需要回答为什么我们要抛弃静态 LoRA，转而在 AdaLoRA 中通过 SVD 分解引入重要性惩罚（动态裁剪低价值维度分得算力）；最终解释 QLoRA 为了实现单卡练百亿，付出了极高额的前向计算代价（Double Quantization 流转解压负担）的工程妥协。
 
 ---
@@ -58,11 +58,11 @@
 **学习重点**：抛弃旧时代的死板训练，理解如何用反馈奖励机制去“调教”概率空间分布。
 
 - **第九天：探索马尔可夫未来传递 (REINFORCE & PPO)**
-  - **What**: 研究 [reinforce.py](./RL/REINFORCE/reinforce.py) 并死磕王权算法 [ppo.py](./RL/PPO/ppo.py)。
-  - **Why**: 当面试问到 RLHF 的本质不稳定问题。你要能写出倒推时间轴算广义优势估计（GAE）的魔法结构！它让当前步的评分不仅看眼下，还能够通过极其复杂的折现率融合几十步以后的因果反馈。证明你不是改改参数的人，而是玩弄策略期望的神。
+  - **What**: 研究 [reinforce.py](./RLHF_Alignment/REINFORCE/reinforce.py) 并死磕王权算法 [ppo.py](./RLHF_Alignment/PPO/ppo.py) 与 [trajectory_chunking_replay.py](./RLHF_Alignment/Trajectory_Replay/trajectory_chunking_replay.py)。
+  - **Why**: 当面试问到 RLHF 的本质不稳定问题。你要能写出倒推时间轴算广义优势估计（GAE）的魔法结构！它让当前步的评分不仅看眼下，还能够通过极其复杂的折现率融合几十步以后的因果反馈。此外，面试极深坑：万古长轴 CoT 推理会导致 PPO OOM 爆显存，你需拿出 Trajectory Chunking 切块法，解决斩断 GAE 链路上引发的马尔科夫连贯性断裂困局。
 
 - **第十天：现代革命性重构卸甲 (DPO vs GRPO)**
-  - **What**: 对比钻研 [dpo.py](./RL/DPO/dpo.py) 与极简大杀器 [grpo.py](./GRPO/grpo.py)，熟读极品面霸长文 [RL-COMPARISON.md](./RL/RL-COMPARISON.md)。
+  - **What**: 对比钻研 [dpo.py](./RLHF_Alignment/DPO/dpo.py) 与极简大杀器 [grpo.py](./RLHF_Alignment/GRPO/grpo.py)，熟读极品面霸长文 [RL-COMPARISON.md](./RLHF_Alignment/RL-COMPARISON.md)。
   - **Why**: 这是你面试要高薪的最后防线。“当你公司没钱跑巨型 4 个模型构成的 PPO 集群怎么办？” 直接把 DPO（通过数学 Log-Sum-Exp 巧劲完全免除 Reward 模型计算）和 DeepSeek 的 GRPO（彻底裁决庞大的 Critic 预估网络，让生成同一个问题的多份不同答案直接在小集群组内互相“内卷攀比评分”归一化）甩给面试官，展示你极强的降级部署实操方案。
 
 ---
@@ -90,9 +90,9 @@
 **学习重点**：不玩文字游戏，让大模型长出能够读取文件执行系统动作手和脚的控制论。
 
 - **第十四天：反击傻瓜式 Prompt 与迷失陷阱 (2025 Context)**
-  - **What**: 脱离玄学写死字符串，看 [dspy_programmatic.py](./Application_Evaluation/Context_Engineering/dspy_programmatic.py) 和破局算法 [graph_rag_retrieval.py](./Application_Evaluation/Context_Engineering/graph_rag_retrieval.py)。
+  - **What**: 脱离玄学写死字符串，看 [dspy_programmatic.py](./Agentic_Applications/Context_Engineering/dspy_programmatic.py) 和破局算法 [graph_rag_retrieval.py](./Agentic_Applications/Context_Engineering/graph_rag_retrieval.py)。
   - **Why**: 因为人类手写的 Prompt 没法迭代优化。你要阐明为何采用 DSPy 编译器思想将 Prompt 作为“张量矩阵”进行迭代优化调参。还要说明在面对大海捞名流的问题中，传统向量 RAG 会把实体信息淹死在中间导致提取失败，为什么 GraphRAG 那种极度费劲抓取聚变节点的社区检测能够一击致命，从而提供唯一的全局宏伟视点解答。
 
 - **第十五天（决战前夜）：让 LLM 干实体的无上限自演化地狱 (Agentic Harness)**
-  - **What**: 参透 [Application_Evaluation/Agentic_Coding_Harness/](./Application_Evaluation/Agentic_Coding_Harness/) 下面的全部代码，包括严苛沙盒路由 [tool_orchestration_loop.py](./Application_Evaluation/Agentic_Coding_Harness/tool_orchestration_loop.py) 与视口 AST 修改 [viewport_file_editor.py](./Application_Evaluation/Agentic_Coding_Harness/viewport_file_editor.py)，以及极度硬核的自循环纠错 [bash_feedback_loop.py](./Application_Evaluation/Agentic_Coding_Harness/bash_feedback_loop.py)。
+  - **What**: 参透 [Agentic_Applications/Agentic_Coding_Harness/](./Agentic_Applications/Agentic_Coding_Harness/) 下面的全部代码，包括严苛沙盒路由 [tool_orchestration_loop.py](./Agentic_Applications/Agentic_Coding_Harness/tool_orchestration_loop.py) 与视口 AST 修改 [viewport_file_editor.py](./Agentic_Applications/Agentic_Coding_Harness/viewport_file_editor.py)，以及极度硬核的自循环纠错 [bash_feedback_loop.py](./Agentic_Applications/Agentic_Coding_Harness/bash_feedback_loop.py)。
   - **Why**: 如果你面前的老板要搞的是 SWE 智能体框架，你不能答你用过 Langchain，那太浅。你需要演示为了防止极度漫长的项目导致上下文耗费 OOM，你怎么强制模型对一个庞然代码库做 AST 局部差异抓取；你需要讲述，当工具执行 bash 失控爆出红线（Traceback）时，你的框架系统是怎么无休止地剥离这些报错塞回给模型强逼他自动流转、修补直至终端绿灯的。这就是这个世界的终极自动化形态！

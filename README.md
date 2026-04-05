@@ -35,27 +35,31 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
    - **[Gemini Native Any-to-Any](./Pretraining/Multi_Modal_Vision_Language/gemini_native_multimodal.py)**: Google's apex native fusion paradigm interleaving text alongside vision tokens directly into shared multi-dimensional joint-attention layers sans projection boundaries.
 
 ### [Supervised Fine-Tuning & PEFT]
-1. **[SFT_Loss](./SFT/SFT_Loss/)**: Causal LM offset targeting and Negative-100 logic.
-2. **[LoRA](./SFT/LoRA/)**: Core Low-Rank Adaptation theory with matrix $B$ zero-initialization.
-3. **[AdaLoRA](./SFT/AdaLoRA/)**: SVD-based adaptive importance evaluation with zero-gradient deadlock evasion.
-4. **[QLoRA](./SFT/QLoRA/)**: Block-wise quantization memory advantages and on-the-fly computational limits.
-5. **[LORA-COMPARISON Guide](./SFT/LORA-COMPARISON.md)**: Deep dive code walkthrough for the LoRA variants.
+1. **[SFT_Loss](./SFT_PEFT/SFT_Loss/)**: Causal LM offset targeting and Negative-100 logic.
+2. **[LoRA](./SFT_PEFT/LoRA/)**: Core Low-Rank Adaptation theory with matrix $B$ zero-initialization.
+3. **[AdaLoRA](./SFT_PEFT/AdaLoRA/)**: SVD-based adaptive importance evaluation with zero-gradient deadlock evasion.
+4. **[QLoRA](./SFT_PEFT/QLoRA/)**: Block-wise quantization memory advantages and on-the-fly computational limits.
+5. **[Sequence Packing](./SFT_PEFT/Sequence_Packing/sequence_packing.py)**: Diagonal Masking and ID-overwrites avoiding catastrophic Padding wastes on batches.
+6. **[LORA-COMPARISON Guide](./SFT_PEFT/LORA-COMPARISON.md)**: Deep dive code walkthrough for the LoRA variants.
 
 ### [Reinforcement Learning & Alignment]
-#### 1. [REINFORCE (Vanilla Policy Gradient)](./RL/REINFORCE/)
+#### 1. [REINFORCE (Vanilla Policy Gradient)](./RLHF_Alignment/REINFORCE/)
 The grandparent of all probabilistic reinforcement alignment methods. Demonstrates reverse Markov discounted returns and the essential implementation of a Baseline value for mathematical variance stability.
 
-#### 2. [PPO (Proximal Policy Optimization)](./RL/PPO/)
+#### 2. [PPO (Proximal Policy Optimization)](./RLHF_Alignment/PPO/)
 The foundational RLHF algorithm behind ChatGPT/InstructGPT. Focuses on Generalized Advantage Estimation (GAE) backwards recursion and the probability clipping mechanism (`Trust Region/Surrogate`) paired with a separate Value network (Critic).
 
-#### 3. [DPO (Direct Preference Optimization)](./RL/DPO/)
+#### 3. [DPO (Direct Preference Optimization)](./RLHF_Alignment/DPO/)
 The breakthrough offline alignment algorithm eliminating the need for a separate reward model. Focuses entirely on optimizing the difference (`log(sigmoid)`) between chosen and rejected response log-probabilities paired with implicit KL bounding against a reference model.
 
-#### 4. [GRPO (Group Relative Policy Optimization)](./RL/GRPO/)
+#### 4. [GRPO (Group Relative Policy Optimization)](./RLHF_Alignment/GRPO/)
 The group-relative policy optimization algorithm popularized by DeepSeekMath. Massively lowers VRAM dependencies by removing the Critic network parameter load and substituting an in-group standard normalization per query.
 
-#### 5. [GSPO (Group Sequence Policy Optimization)](./RL/GSPO/)
+#### 5. [GSPO (Group Sequence Policy Optimization)](./RLHF_Alignment/GSPO/)
 The sequence-level RLHF advancement introduced by the Qwen team. Shifts policy importance ratios from localized Token-level constraints to Sequence-level geometrically averaged restraints, preventing noise scaling and instability for ultra-long reasoning and CoT (Chain-of-Thought) sequence tuning.
+
+#### 6. [Trajectory Chunking Replay](./RLHF_Alignment/Trajectory_Replay/trajectory_chunking_replay.py)
+Safe segmentation algorithms splitting deep CoT sequences while preserving RL Markov global bounds (GAE) for massive memory footprint reductions.
 
 ### [Inference & Serving]
 1. **[PagedAttention / Virtual Memory](./Inference_Serving/PagedAttention/)**: OS-level Virtual memory mechanics porting contiguous logical blocks into scattered physical Page Tables maximizing KV Cache GPU utilization, eliminating internal/external memory fragmentation.
@@ -68,17 +72,14 @@ The sequence-level RLHF advancement introduced by the Qwen team. Shifts policy i
 4. **[Data Parallelism (DDP)](./Distributed_Parallel/Data_Parallel_DDP/)**: Overcoming DP Master bottlenecks via Ring All-Reduce multi-process vector synchronizations.
 5. **[Distributed Comparison Hub](./Distributed_Parallel/README.md)**: Master interview guide connecting the architectural scaleout.
 
-### [Application & Evaluation (2025 SOTA)]
-1. **[Context Engineering](./Application_Evaluation/Context_Engineering/)**:
-   - **[DSPy Prompts](./Application_Evaluation/Context_Engineering/dspy_programmatic.py)**: Compiling and optimizing modules programmatically escaping manual prompt heuristic limits.
-   - **[Agentic GraphRAG](./Application_Evaluation/Context_Engineering/graph_rag_retrieval.py)**: Macro-perspective Graph traversals avoiding standard 'Lost in the Middle' top-K Vector chunk drops.
-2. **[Training Context Management](./Application_Evaluation/Context_Management_In_Training/)**:
-   - **[Sequence Packing](./Application_Evaluation/Context_Management_In_Training/sequence_packing.py)**: Diagonal Masking and ID-overwrites avoiding catastrophic Padding wastes on batches.
-   - **[Trajectory Chunking](./Application_Evaluation/Context_Management_In_Training/trajectory_chunking_replay.py)**: Safe segmentation algorithms splitting deep CoT sequences while preserving RL Markov global bounds (GAE).
-3. **[Agentic Coding Harness](./Application_Evaluation/Agentic_Coding_Harness/)**:
-   - **[Tool Orchestration](./Application_Evaluation/Agentic_Coding_Harness/tool_orchestration_loop.py)**: Sandbox encapsulation and rigorous JSON/XML parameter executions blocking model chat escapes.
-   - **[Viewport & AST Editing](./Application_Evaluation/Agentic_Coding_Harness/viewport_file_editor.py)**: Line-range partial reading and Diff editing avoiding global repository context crashes.
-   - **[Bash Feedback Matrix](./Application_Evaluation/Agentic_Coding_Harness/bash_feedback_loop.py)**: Unsupervised Agent Self-Healing looping terminals tracebacks triggering cyclic autonomous code recoveries.
+### [Agentic Applications (2025 SOTA)]
+1. **[Context Engineering](./Agentic_Applications/Context_Engineering/)**:
+   - **[DSPy Prompts](./Agentic_Applications/Context_Engineering/dspy_programmatic.py)**: Compiling and optimizing modules programmatically escaping manual prompt heuristic limits.
+   - **[Agentic GraphRAG](./Agentic_Applications/Context_Engineering/graph_rag_retrieval.py)**: Macro-perspective Graph traversals avoiding standard 'Lost in the Middle' top-K Vector chunk drops.
+2. **[Agentic Coding Harness](./Agentic_Applications/Agentic_Coding_Harness/)**:
+   - **[Tool Orchestration](./Agentic_Applications/Agentic_Coding_Harness/tool_orchestration_loop.py)**: Sandbox encapsulation and rigorous JSON/XML parameter executions blocking model chat escapes.
+   - **[Viewport & AST Editing](./Agentic_Applications/Agentic_Coding_Harness/viewport_file_editor.py)**: Line-range partial reading and Diff editing avoiding global repository context crashes.
+   - **[Bash Feedback Matrix](./Agentic_Applications/Agentic_Coding_Harness/bash_feedback_loop.py)**: Unsupervised Agent Self-Healing looping terminals tracebacks triggering cyclic autonomous code recoveries.
 
 ---
 
