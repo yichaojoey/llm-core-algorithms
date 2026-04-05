@@ -16,6 +16,13 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
 2. **[Tokenizer Subword Rules](./Pretraining/Tokenizer/)**: Text mapping methodologies defining intelligence limits early on.
    - **[BPE](./Pretraining/Tokenizer/BPE/)**: Absolute-Frequency bounded bindings establishing GPT sub-word behaviors.
    - **[WordPiece](./Pretraining/Tokenizer/WordPiece/)**: Mutual-Information Likelihood fractionations preserving tightest word-pairings backing BERT designs.
+3. **[Attention Family](./Pretraining/Attention/)**: Core Sequence Target matching algorithms.
+   - **[MHA (Multi-Head Attention)](./Pretraining/Attention/mha.py)**: The classical dimension-shattering contextual mechanism.
+   - **[GQA (Grouped-Query Attention)](./Pretraining/Attention/gqa.py)**: Extreme KV Cache memory-saving paradigms via expanding shared keys matrices.
+4. **[MoE (Mixture of Experts)](./Pretraining/MoE/)**: Sparse computation routing matrices featuring crucial Aux-Loss penalties averting load collapse.
+5. **[Modern Layers](./Pretraining/Modern_Layers/)**:
+   - **[RMSNorm](./Pretraining/Modern_Layers/rmsnorm.py)**: Zero-mean shifting optimization.
+   - **[SwiGLU](./Pretraining/Modern_Layers/swiglu.py)**: SiLU-gated bifurcated activation MLPs.
 
 ### [Supervised Fine-Tuning & PEFT]
 1. **[SFT_Loss](./SFT/SFT_Loss/)**: Causal LM offset targeting and Negative-100 logic.
