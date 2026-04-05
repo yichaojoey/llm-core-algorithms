@@ -46,13 +46,16 @@ class AdaLoRALinear(nn.Module):
         
         # 传统 LoRA 是 A 随机，B 给全 0。
         # 但在 AdaLoRA 中，乘积链是 P * E * Q。
-        # 如果你这里 P 给 0，且 E 也给 0，那么恭喜你梯度链彻底爆掉死锁了！
-        # 推导：d_L / d_E 包含了 P_T*...*Q_T。如果 P=0，那 E 的梯度永远是零！模型到死也学不会！
+        # 【理论揭秘】：如果你这里 P 给 0，且 E 也跟着潜意识强迫症给了 0，
+        # 那么恭喜你梯度链彻底爆掉死锁了！微调直接失效成植物人！
+        # 链式法则推导数学：dL / dE = P^T * (dL / dW) * Q^T
+        # 由此可见：如果门卫 P = 0，那么上述公式外侧被死死盖上了 0 乘子。
+        # E 的梯度 dL/dE 永远为零！模型到死也学不会怎么调动通道重要性！
         
         # ✅ 正确做法：
-        nn.init.normal_(self.lora_P) # P 必须有微弱的方差保证出点声音
-        nn.init.normal_(self.lora_Q) # Q 同样打乱
-        nn.init.zeros_(self.lora_E)  # 真正让初始 ΔW=0 不破坏系统的重负交给了把门的核心分数板 E！
+        nn.init.normal_(self.lora_P) # P 必须有微弱的方差保证出点声音传达梯度
+        nn.init.normal_(self.lora_Q) # Q 同样打乱提供映射
+        nn.init.zeros_(self.lora_E)  # 真正让初始 ΔW=0 （不破坏千亿系统原生学识基石）的重负交给了中心控制器 E！
         
     def forward(self, x: torch.Tensor):
         original_output = F.linear(x, self.weight, self.bias)

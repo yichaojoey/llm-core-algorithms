@@ -29,16 +29,23 @@ def compute_dpo_loss(
         loss, chosen_rewards, rejected_rewards
     """
     
-    # 1. 计算 Preference Model 的隐式 Reward (Reward ∝ log(pi / ref))
-    # 数学上利用对数减法等同于商：log(A/B) = log(A) - log(B)
+    # 1. 计算 Preference Model 的隐式 Reward (隐式奖励)
+    # 【理论揭秘】：DPO 绝杀了 Reward Model 的精髓：它推导出你不需要另开显存放一个 Reward 预估网络！
+    # 如果两个模型分别给出了回答对数概率 $\pi_{target}$ 和 $\pi_{ref}$，
+    # 那么奖励分数 Reward 在数学上严格正比于它们对数概率的差值： R(x,y) = beta * log( pi_target(y|x) / pi_ref(y|x) )
+    # 代码上利用对数特性完美替代除法：log(A/B) = log(A) - log(B)
     pi_logratios = policy_chosen_logps - policy_rejected_logps
     ref_logratios = reference_chosen_logps - reference_rejected_logps
 
-    # 2. R_chosen - R_rejected (奖励优势差值)
+    # 2. 计算 logits = R_chosen - R_rejected (好的回答的隐式奖励 - 坏的回答的隐式奖励)
+    # 实际上就是通过交叉参照把好差区分开来。
     logits = pi_logratios - ref_logratios
     
-    # 3. DPO Loss = -log(sigmoid(beta * logits))
-    # 使用 PyTorch 原生的 F.logsigmoid 防止 exp(-x) 由于数值过高带来的溢出
+    # 3. DPO Loss 目标锁定 = -log(sigmoid(beta * logits))
+    # 【理论揭秘】：基于 Bradley-Terry 模型（用于体育队伍对决概率的古典算法）。
+    # 如果 chosen 比 rejected 好，差值越大越好！为了在梯度流中不炸大数边界引发不稳，
+    # 我们将差值丢入 sigmoid 让它介于 0和1，再求对数期望。
+    # 代码坑点：必须要使用 PyTorch 内置的 F.logsigmoid，如果你手写 -torch.log(torch.sigmoid(logits)) 在极端差值下极易 NaN 溢出。
     loss = -F.logsigmoid(beta * logits)
     
     # 4. (额外) 监控指标计算，脱离梯度流返回

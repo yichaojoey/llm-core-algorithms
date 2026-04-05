@@ -82,6 +82,12 @@ def compute_gae(rewards, state_values, is_terminals, gamma=0.99, lam=0.95):
     """
     核心组件 1: 计算广义优势估计 (GAE - Generalized Advantage Estimation)
     
+    【理论揭秘】：如果你仅仅使用 Advantage = Return - Value (单步 TD-Error)，会发现高方差让人绝望。
+    GAE 通过引入 lambda 参数，把后续长远的优势做指数折现。
+    公式推导：A_t = delta_t + (gamma * lambda) * delta_{t+1} + (gamma * lambda)^2 * delta_{t+2} + ...
+    其中单步误差 delta_t = r_t + gamma * V(s_{t+1}) - V(s_t)
+    从而能在方差 (Variance) 和 偏差 (Bias) 之间找到一个极美的平衡。
+    
     Args:
         rewards: 奖励序列 [seq_len]
         state_values: 状态价值序列 [seq_len]
@@ -169,10 +175,16 @@ class PPO:
             state_values = torch.squeeze(state_values)
             
             # 2. 计算 Ratio (pi_theta / pi_theta_old)
-            # 由于存储的是 logprob, 用 exp(log_b - log_a) = b/a 来计算
+            # 【理论揭秘】：在策略梯度里真正的公式通常带有庞大的除法。
+            # 这里利用指数换底公式化除法为减法：exp(ln(b) - ln(a)) = exp(ln(b/a)) = b/a
+            # 这种在对数维度 (log-space) 的相减比直接真数相除带来的浮点数溢出风险小极其多。
             ratios = torch.exp(logprobs - old_logprobs.detach())
             
             # 3. 计算 Surrogate Loss (PPO Clip 目标)
+            # 【理论揭秘】：PPO 最伟大的创新就是这个截断（Clip）操作：
+            # 如果 advantage > 0（好动作），我们就放大它的概率！但放大也不能无脑放（不能超出 1+eps_clip），否则步子太大扯到蛋破坏旧学识（破坏 Trust Region）。
+            # 如果 advantage < 0（烂动作），我们就无限压小它的概率。但只压小到 1-eps_clip 就差不多了。
+            # Loss = min( ratio * A, clamp(ratio, 1-eps, 1+eps) * A )
             surr1 = ratios * advantages
             surr2 = torch.clamp(ratios, 1 - self.eps_clip, 1 + self.eps_clip) * advantages
             

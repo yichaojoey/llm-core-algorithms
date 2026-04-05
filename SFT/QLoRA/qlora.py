@@ -58,16 +58,20 @@ class QLoRALinear(nn.Module):
     def _dequantize_weight(self) -> torch.Tensor:
         """
         面试官绝对核心追问点：大模型反量化机制到底是在干嘛？
-        大模型 QLoRA 在推进 forward 线计算时，会将这块封印的残缺整数砖块当场解冻并约算为带小数点的浮点格式送入乘法器。
-        所谓的 "Compute in 16-bit, Store in 4-bit"。
+        【理论揭秘】：如果我们一棒子把一整个矩阵的万亿浮点数压扁为 4位(NF4阶梯)，
+        如果有几个罕见的极大奇异值游离突刺（Outliers, 比如 100.0），
+        它会把整个刻度压缩的尺子拉长，导致其余处于 -1.0 到 1.0 的正常主成分信息
+        全被降维归并舍到了 0 号小槽内！全部被无情抹去清零，模型当场变傻子！
+        
+        解法：必须在局部执行 Block-wise 量化（比如每 64 个数字一组），给每组建一个私人缩放极值账本。
         """
-        # 将原始量化的整数基础强行提升转换回浮点参与算子流通
+        # 将原始量化的粗糙低精度整数基础强行提升转换回单/双精度浮点以参与正常算子流通
         w_float = self.quantized_weight.float() 
         
-        # 我们按照之前打包切分的 block_size，用 repeat_interleave 还原铺开这些被精简浓缩的单独区间的最大值尺度
+        # 我们按照之前打包切分的 block_size，用 repeat_interleave 将局部私有账本给复制还原铺开发射覆盖。
         repeated_absmax = self.absmax_blocks.repeat_interleave(self.block_size, dim=1)
         
-        # (基础反量化示意) 利用还原铺开的刻度尺尺度阵列，乘平原本的粗糙量化小数字阵列：
+        # (基础反量化示意) 利用还原铺开的长尺度阵列，精细覆盖乘平原本低辨识度数字阵列，补上细节：
         dequantized_w = w_float * repeated_absmax
         
         return dequantized_w

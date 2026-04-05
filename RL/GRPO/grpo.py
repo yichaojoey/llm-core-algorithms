@@ -31,14 +31,19 @@ def compute_grpo_loss(
     """
     
     # 1. 组相对优势计算: 无需 Critic，同组内自带天然 Baseline
+    # 【理论揭秘】：PPO 里为了计算优势需要训练一个巨大的 Value 网络来给出基准线，以判断“某个动作究竟多好”。
+    # GRPO 的神来之笔：让模型针对同一个问题 G 次作答。用 G 个结果打分的均值当 Baseline！
+    # 数学公式：A_i = (R_i - mean(R_1 ... R_G)) / std(R_1 ... R_G)
     mean_reward = rewards.mean()
-    # Pytorch 默认自由度为 1 (unbiased=True)，为了对标严格公式通常取偏方差 unbiased=False
+    # Pytorch 默认自由度为 1 (unbiased=True)，为了对标严格的强化概率公式，这里刻意压实偏方差 unbiased=False
     std_reward = rewards.std(unbiased=False) 
     
-    # +1e-8 防止全部抽样答案一样导致除 0 错误
+    # +1e-8 防御机制：万一模型这 G 次生成了完全一模一样的答案，方差为0会导致系统全局除以0报错雪崩。
     advantages = (rewards - mean_reward) / (std_reward + 1e-8)  
     
-    # 按照 SeqLen 维度进行升维填充：[G] -> [G, 1]，方便后续与 [G, SeqLen] 的 Ratios 大小靠拢使用广播机制
+    # 维度升维填充技巧：原 Advantages 为 [G] 标量群。
+    # 然而模型要评估每一个词汇带来的细碎贡献，后续 Ratio 尺度为巨大的 [G, SeqLen]。
+    # 大配小运算时必须主动打开空维进行 Broadcasting（单对多广播机制）。
     advantages = advantages.unsqueeze(1) 
     
     # 2. Token-level 重要性比率 ratios

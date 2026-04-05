@@ -23,6 +23,10 @@ class LoRALinear(nn.Module):
         self.lora_alpha = lora_alpha
         
         # 核心面试点：通过除以 r 以维持初始学习率的超参稳定性一致性
+        # 【理论揭秘】：在数学上，初始参数由于方差会在乘法中被放大。如果我们将矩阵秩 R 扩大 4 倍，
+        # B * A 积出来的输出方差会跟着变大。如果我们强制全局乘以 lora_alpha / r，
+        # 则能够保证在切换任意参数大小时，输出的前向/反向梯度的方差稳定平衡。
+        # 让使用者无需更改 Learning Rate 这个极其敏感的超参数配置即可随意改变容量！
         self.scaling = self.lora_alpha / self.r
         
         # 1. 原本的大参数权重（训练时需要被彻底冻结，不传挂梯度要求）
