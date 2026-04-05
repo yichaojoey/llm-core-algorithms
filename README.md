@@ -19,6 +19,7 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
 3. **[Attention Family](./Pretraining/Attention/)**: Core Sequence Target matching algorithms.
    - **[MHA (Multi-Head Attention)](./Pretraining/Attention/mha.py)**: The classical dimension-shattering contextual mechanism.
    - **[GQA (Grouped-Query Attention)](./Pretraining/Attention/gqa.py)**: Extreme KV Cache memory-saving paradigms via expanding shared keys matrices.
+   - **[FlashAttention](./Pretraining/Attention/flashattention.py)**: Memory-IO avoiding (O(Nd)) optimization block representations demonstrating Online Softmax formulations.
 4. **[MoE (Mixture of Experts)](./Pretraining/MoE/)**: Sparse computation routing matrices featuring crucial Aux-Loss penalties averting load collapse.
 5. **[Modern Layers](./Pretraining/Modern_Layers/)**:
    - **[RMSNorm](./Pretraining/Modern_Layers/rmsnorm.py)**: Zero-mean shifting optimization.
