@@ -27,9 +27,9 @@
   - **What**: 研读 [flashattention.py](./Pretraining/Attention/flashattention.py)。
   - **Why**: 面试官套话：“FA 让计算变少了对吧？” 你必须反驳！FA 的 FLOPs 其实增加了，它伟大的地方在于通过分块 (Tiling) 算法避开了恐怖的 HBM（全局极慢显存）读写等待。你需要手推代码里的 `Online Softmax` （每当找到新的局部最大值时，如何利用指数差值暴击更新旧分母的数学纠偏法则），这证明了你是极致的物理底层优化专家！
 
-- **第五天：国产开源之光结构解剖 (Qwen Block)**
-  - **What**: 组装工厂 [qwen_block.py](./Pretraining/Qwen2_5_Builder/qwen_block.py) 与探讨 [rmsnorm.py](./Pretraining/Modern_Layers/rmsnorm.py) 和 [swiglu.py](./Pretraining/Modern_Layers/swiglu.py)。
-  - **Why**: 证明实战经验。你需要解释为什么现代模型废弃了 LayerNorm（省掉均值计算提速），解释 SwiGLU 双网络门控的意义，并且特别解释为什么 Qwen 不走寻常路地恢复了 Attention 的 `bias=True`（强化对长尾和标点符号的空间区分度）。
+- **第五天：大厂基石方阵与设计哲学冲突 (Decoder Block Zoo)**
+  - **What**: 组装工厂横向拉通 [llama3_1_block.py](./Pretraining/Decoder_Block_Zoo/llama3_1_block.py)、[qwen2_5_block.py](./Pretraining/Decoder_Block_Zoo/qwen2_5_block.py) 和 [deepseek_v3_block.py](./Pretraining/Decoder_Block_Zoo/deepseek_v3_block.py)。
+  - **Why**: 极有高度的顶峰提问！你需要像背家谱一样当面白板拆穿三家设计的哲学分水岭：LLaMA 为什么打死不用 QKV bias 偏置（死保尺度平移不变性和后期完美量化），Qwen 为什么违背常理死死加上偏置（给位置提供特定微量常数锚点解决局部乱码），以及 DeepSeek 到底是个什么怪物组合（上半身切装 MLA 压碎长程 KV 缓存显存，下半身切换 MoE 避开高密度庞大计算）的完整拼图！
 
 ---
 

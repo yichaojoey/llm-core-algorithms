@@ -25,8 +25,10 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
 5. **[Modern Layers](./Pretraining/Modern_Layers/)**:
    - **[RMSNorm](./Pretraining/Modern_Layers/rmsnorm.py)**: Zero-mean shifting optimization.
    - **[SwiGLU](./Pretraining/Modern_Layers/swiglu.py)**: SiLU-gated bifurcated activation MLPs.
-6. **[Qwen 2.5 Architecture Builder](./Pretraining/Qwen2_5_Builder/)**: 
-   - **[Qwen Decoder Block](./Pretraining/Qwen2_5_Builder/qwen_block.py)**: Assembling RMSNorm, SwiGLU, and distinctive Bias-enabled GQA arrays depicting a perfect modern Pre-Norm setup separating it from LLaMA baselines.
+6. **[Decoder Block Zoo](./Pretraining/Decoder_Block_Zoo/)**:
+   - **[LLaMA-3.1 Block](./Pretraining/Decoder_Block_Zoo/llama3_1_block.py)**: Absolute minimalist architecture avoiding any $Bias$ parameters maximizing Scale Invariance properties.
+   - **[Qwen-2.5 Block](./Pretraining/Decoder_Block_Zoo/qwen2_5_block.py)**: Anchored bias injections fortifying spatial syntax tracking over MHA/GQA variations.
+   - **[DeepSeek-V3 Block](./Pretraining/Decoder_Block_Zoo/deepseek_v3_block.py)**: Ultimate hybrid marrying top-half MLA bottlenecked Attention with bottom-half MoE dense-FFN computations minimizing peak theoretical requirements.
 
 ### [Supervised Fine-Tuning & PEFT]
 1. **[SFT_Loss](./SFT/SFT_Loss/)**: Causal LM offset targeting and Negative-100 logic.
