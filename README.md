@@ -52,6 +52,18 @@ The group-relative policy optimization algorithm popularized by DeepSeekMath. Ma
 ### 6. [GSPO (Group Sequence Policy Optimization)](./RL/GSPO/)
 The sequence-level RLHF advancement introduced by the Qwen team. Shifts policy importance ratios from localized Token-level constraints to Sequence-level geometrically averaged restraints, preventing noise scaling and instability for ultra-long reasoning and CoT (Chain-of-Thought) sequence tuning.
 
+### [Inference & Serving]
+1. **[Paged Attention & KV Cache](./Inference_Serving/PagedAttention/)**:
+   - **[KV Cache Simulator](./Inference_Serving/PagedAttention/kv_cache_generation.py)**: Mechanisms highlighting O(N) compute via cache appending.
+   - **[Paged Attention Simulator](./Inference_Serving/PagedAttention/paged_attention.py)**: OS VM mappings solving GPU block fragmentations (vLLM blueprints).
+
+### [Distributed & Parallel Clusters]
+1. **[ZeRO & DeepSpeed](./Distributed_Parallel/ZeRO_DeepSpeed/)**: Stage-1/2/3 parameter optimization splits breaking memory barriers.
+2. **[Tensor Parallelism (Megatron)](./Distributed_Parallel/Tensor_Parallel_Megatron/)**: Row/Column MLP matrix splits verifying synchronous associativity equations.
+3. **[Pipeline Parallelism](./Distributed_Parallel/Pipeline_Parallel_Megatron/)**: The 1F1B (One Forward One Backward) dense interleaving logic avoiding GPU Bubbles.
+4. **[Data Parallelism (DDP)](./Distributed_Parallel/Data_Parallel_DDP/)**: Overcoming DP Master bottlenecks via Ring All-Reduce multi-process vector synchronizations.
+5. **[Distributed Comparison Hub](./Distributed_Parallel/README.md)**: Master interview guide connecting the architectural scaleout.
+
 ## 📖 Deep Dives
 
 For an ultra-detailed, code-level breakdown on the structural differences and dimensional changes when putting these probabilistic LLM algorithms into practice, read the comprehensive [RL-COMPARISON Guide](./RL/RL-COMPARISON.md).
