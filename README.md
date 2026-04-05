@@ -24,6 +24,8 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
 5. **[Modern Layers](./Pretraining/Modern_Layers/)**:
    - **[RMSNorm](./Pretraining/Modern_Layers/rmsnorm.py)**: Zero-mean shifting optimization.
    - **[SwiGLU](./Pretraining/Modern_Layers/swiglu.py)**: SiLU-gated bifurcated activation MLPs.
+6. **[Qwen 2.5 Architecture Builder](./Pretraining/Qwen2_5_Builder/)**: 
+   - **[Qwen Decoder Block](./Pretraining/Qwen2_5_Builder/qwen_block.py)**: Assembling RMSNorm, SwiGLU, and distinctive Bias-enabled GQA arrays depicting a perfect modern Pre-Norm setup separating it from LLaMA baselines.
 
 ### [Supervised Fine-Tuning & PEFT]
 1. **[SFT_Loss](./SFT/SFT_Loss/)**: Causal LM offset targeting and Negative-100 logic.
