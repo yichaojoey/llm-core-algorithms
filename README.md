@@ -32,6 +32,7 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
 7. **[Multi-Modal Vision-Language](./Pretraining/Multi_Modal_Vision_Language/)**:
    - **[ViT Image Patching](./Pretraining/Multi_Modal_Vision_Language/vit_image_patching.py)**: Flattening 2D spatial pixel maps into sequence-compatible 1D token domains.
    - **[LLaVA MLP Projector](./Pretraining/Multi_Modal_Vision_Language/cross_modal_projector.py)**: The disruptive bridge substituting massive Cross-Attention layers with brute-force linear translation forcing 1024-dim visual tokens into 4096-dim native embedding spaces mapped directly alongside text prompts.
+   - **[Gemini Native Any-to-Any](./Pretraining/Multi_Modal_Vision_Language/gemini_native_multimodal.py)**: Google's apex native fusion paradigm interleaving text alongside vision tokens directly into shared multi-dimensional joint-attention layers sans projection boundaries.
 
 ### [Supervised Fine-Tuning & PEFT]
 1. **[SFT_Loss](./SFT/SFT_Loss/)**: Causal LM offset targeting and Negative-100 logic.
