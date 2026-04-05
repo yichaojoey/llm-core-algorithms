@@ -1,37 +1,39 @@
 # 预训练基座主引擎：Attention 变体 (MHA vs GQA) 面试指南
 
-> 📖 **一句话解释**：大厂预训练模型面试考 Attention 的时候在考什么？不是默写那个 $Q*K/\sqrt{d}$ 的小公式，而是让你说穿 **KV Cache (键值缓存) 在推理阶段是如何吃掉几百 G 显存的？** 为了保住显卡不挂掉，现在的业界龙头（LLaMa, Qwen, Mistral 等）为何全票投诚并全盘抄袭了 Grouped-Query Attention (GQA) 取代原本封神的 MHA ？
+> 📖 **一句话解释**：大厂预训练模型面试考 Attention 的时候在考什么？不是默写那个 $Q*K/\sqrt{d}$ 的小公式，而是让你说穿 **KV Cache (键值缓存) 在推理阶段是如何吃掉几百 G 显存的？** 为了保住显卡不挂掉，现在的业界龙头（LLaMa, Qwen, Mistral, DeepSeek 等）为何全票投诚并全盘抄袭了 Grouped-Query Attention (GQA) 取代原本封神的 MHA，甚至进一步演进出 MLA？
 
 ---
 
 ## 目录
 
-- [致命拷问：为何抛弃 MHA？](#为何抛弃-mha)
-- [群租房理念：GQA 降维打击与广播数学](#群租房理念-gqa)
+- [一. Multi-Head Attention (MHA): 标准巨像](#一-multi-head-attention-mha-标准巨像)
+- [二. Grouped-Query Attention (GQA): LLaMA 3 的瘦身魔法](#二-grouped-query-attention-gqa-llama-3-的瘦身魔法)
+- [三. FlashAttention: 突破 I/O 硬件屏障](#三-flashattention-突破-io-硬件屏障)
+- [四. Multi-head Latent Attention (MLA): DeepSeek-V3/R1 颠覆一切的显存神降](#四-multi-head-latent-attention-mla-deepseek-v3r1-颠覆一切的显存神降)
 - [面试必考的 Broadcast 代码段](#面试必考张量变阵代码)
 
 ---
 
-## 为何抛弃 MHA？
+## 一. Multi-Head Attention (MHA): 标准巨像
 大家知道，普通 Transformer 一层一层套，为了预测下一个词，历史产生的 K (Key) 和 V (Value) 会常驻在内存不能被删掉（这叫 KV Cache）。
 在原汁原味的 **MHA (Multi-Head Attention)** 中，如果你配置了 32 个 Query 头捕捉不同的语义维度，那你必须为他们配发 32 个 Key 头和 32个 Value头 也就是做一对一的配置。
 *   **噩梦到来**：批次一旦增大，文本只要推到几千字长。这堆一对一生成的 K 和 V 长长的大冰糖葫芦就必须存在极快的 GPU 显存内。一张 A100 立马报错 OutOfMemory！
 *   换言之：**推理的吞吐量天花板根本不是算力墙，而是被这堆 32 个头维护的数据引发的内存容量墙 / 带宽 IO墙 堵死了**。
 
-## 群租房理念：GQA
+## 二. Grouped-Query Attention (GQA): LLaMA 3 的瘦身魔法
 **GQA (Grouped-Query Attention)** 在 2023 年统一了江湖。
 既然给每一个 Query 大少爷配发专属的 K / V 保镖太烧钱了。那我们能不能扣门一点？8 个 Query 并成一组，共享一套 K/V 保镖！
 于是，Query 的维度还是 32头（用于极致发散思维找问题），但 K 和 V 被极限缩小为 4头！
 *   **极简内存**：常驻内存要保存的数据直接干掉了 8 倍！！！(从32头降到了4头)从而把极其宝贵的 GPU 显存压榨到了极点，直接可以把 Batch推理放大很多倍。
 *   **不掉效果**：由于 Q 依然多头保持自由，虽然 K 共享，但神奇的大模型证实并吸纳了这点缺陷。GQA 效果无限接近 1:1 的 MHA！并完胜所有的全卡只用1个公用头的 MQA。
 
-## 3. FlashAttention 的内存墙破局 (IO Tiling)
-**FlashAttention (FA)** 几乎是目前但凡做微调和算子必被拷问的一环。你切记一个最大避坑点：当面试官问你：“FA 是如何大发神威削减了海量算力解决瓶颈的？” 你要是点头顺着他往下说，直接就被赶出门了。
+## 三. FlashAttention: 突破 I/O 硬件屏障
+**FlashAttention (FA)** 几乎是目前但凡做微调和算子必被拷问的一环。
 
 **FA 核心理念根本不是降低算力 FLOPs！其实 FLOPs (浮点乘加指令量)它甚至反过来还多做了一丢丢额外的计算！它降低的是致命恶魔内存的极致大拖累 —— IO Read/Write！**
 
 它洞若观火地指出：芯片上离计算晶体管最近的高速缓存 **SRAM** 其实跑得如同闪电飞一样快（算力不是瓶颈），但是它极度小（比如几十兆）。而我们在外面插的大显存 **HBM** 动不动 80 GB 超庞大但是它太外重内干导致读数据极其拉跨慢长（此即 Memory Wall 内存墙）。
-为了不把以前极其长的一条队伍：$\text{Softmax}(Q K^T)$ 形成高达 $O(N^2)$ 的黑洞般大小的数字群全部扔去外部很慢的 HBM 然后再一点一点读进来（一头牛非要赶出去又牵回来反复做除法拉长延时掉速）。
+为了不把以前极其长的一条队伍：$\text{Softmax}(Q K^T)$ 形成高达 $O(N^2)$ 的黑洞般大小的数字群全部扔去外部很慢的 HBM 然后再一点一点读进来。
 
 **神级 Tiling 分块大卸八块法 + Online Softmax 逻辑锁**：
 我们直接一点点抽取 Query 切块和对应的所有 KV 小切块，全部缩在小小的晶体管极少范围内做内积碰撞擦出火花立刻生成出一点局部特征。并且极其讨巧在数学推导上演变出了所谓的 `Online Softmax` (详见代码内解析如何进行老大哥被推翻时的分母退位降级乘法修正法！)。直接让最终的缩影张量一直保持最多也不超过 $O(N \cdot d)$ 而非极其恐怖的平方 $O(N^2)$。

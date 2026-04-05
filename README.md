@@ -16,10 +16,11 @@ A clean, minimalist, and interview-oriented repository for the core algorithms p
 2. **[Tokenizer Subword Rules](./Pretraining/Tokenizer/)**: Text mapping methodologies defining intelligence limits early on.
    - **[BPE](./Pretraining/Tokenizer/BPE/)**: Absolute-Frequency bounded bindings establishing GPT sub-word behaviors.
    - **[WordPiece](./Pretraining/Tokenizer/WordPiece/)**: Mutual-Information Likelihood fractionations preserving tightest word-pairings backing BERT designs.
-3. **[Attention Family](./Pretraining/Attention/)**: Core Sequence Target matching algorithms.
-   - **[MHA (Multi-Head Attention)](./Pretraining/Attention/mha.py)**: The classical dimension-shattering contextual mechanism.
-   - **[GQA (Grouped-Query Attention)](./Pretraining/Attention/gqa.py)**: Extreme KV Cache memory-saving paradigms via expanding shared keys matrices.
-   - **[FlashAttention](./Pretraining/Attention/flashattention.py)**: Memory-IO avoiding (O(Nd)) optimization block representations demonstrating Online Softmax formulations.
+3. **[Attention Variants](./Pretraining/Attention/)**:
+   - **[Multi-Head Attention (MHA)](./Pretraining/Attention/mha.py)**: The baseline classic implementation showing shape transformations and pure $QK^T/ \sqrt{d}$ cross-dependencies.
+   - **[Grouped-Query Attention (GQA)](./Pretraining/Attention/gqa.py)**: The LLaMA 3 standard lowering KV Cache footprints by enforcing head broadcasting boundaries.
+   - **[DeepSeek MLA (Multi-head Latent Attention)](./Pretraining/Attention/mla_deepseek.py)**: The 2025 DeepSeek-V3/R1 core mechanism projecting massive KV memory footprints down to a narrow Latent vector ($c_{KV}$) and decoupling RoPE coordinates, breaking the 128K context bounds.
+   - **[FlashAttention Loop](./Pretraining/Attention/flashattention.py)**: Simulates the Memory Tiling and Online Softmax logic preventing O(N^2) memory block allocations avoiding the GPU memory wall.
 4. **[MoE (Mixture of Experts)](./Pretraining/MoE/)**: Sparse computation routing matrices featuring crucial Aux-Loss penalties averting load collapse.
 5. **[Modern Layers](./Pretraining/Modern_Layers/)**:
    - **[RMSNorm](./Pretraining/Modern_Layers/rmsnorm.py)**: Zero-mean shifting optimization.
@@ -51,9 +52,8 @@ The group-relative policy optimization algorithm popularized by DeepSeekMath. Ma
 The sequence-level RLHF advancement introduced by the Qwen team. Shifts policy importance ratios from localized Token-level constraints to Sequence-level geometrically averaged restraints, preventing noise scaling and instability for ultra-long reasoning and CoT (Chain-of-Thought) sequence tuning.
 
 ### [Inference & Serving]
-1. **[Paged Attention & KV Cache](./Inference_Serving/PagedAttention/)**:
-   - **[KV Cache Simulator](./Inference_Serving/PagedAttention/kv_cache_generation.py)**: Mechanisms highlighting O(N) compute via cache appending.
-   - **[Paged Attention Simulator](./Inference_Serving/PagedAttention/paged_attention.py)**: OS VM mappings solving GPU block fragmentations (vLLM blueprints).
+1. **[PagedAttention / Virtual Memory](./Inference_Serving/PagedAttention/)**: OS-level Virtual memory mechanics porting contiguous logical blocks into scattered physical Page Tables maximizing KV Cache GPU utilization, eliminating internal/external memory fragmentation.
+2. **[Speculative Decoding / Draft-Verify](./Inference_Serving/Speculative_Decoding/)**: The ultimate speed acceleration avoiding Memory Bandwidth bound limits. Small local models draft $N$ tokens ahead, while large arrays compute huge batched verification matrices in a single forward pass scaling Output Speed.
 
 ### [Distributed & Parallel Clusters]
 1. **[ZeRO & DeepSpeed](./Distributed_Parallel/ZeRO_DeepSpeed/)**: Stage-1/2/3 parameter optimization splits breaking memory barriers.

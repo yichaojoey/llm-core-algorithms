@@ -9,11 +9,12 @@
 
 ### 🟢 阶段一：筑基期 (预训练底层原子结构)
 **目标岗**：算法研究员 (Researcher) / 模型训练工程师 (Pretraining Engineer)
-**学习重点**：熟悉当代主流架构（以 Qwen 2.5 / LLaMA 3 为蓝图），撕碎“写死前向网络”的面具，掌握真正的张量数学艺术。
+**学习重点**：熟悉当代主流架构（以 Qwen 2.5 / DeepSeek V3/R1 为蓝图），撕碎“写死前向网络”的面具，掌握真正的张量数学艺术。
 - **第一天**：研读 `Pretraining/Attention/mha.py` 和 `gqa.py`。**[白板硬装]** 面试必考：GQA 如何通过 `expand` 和 `reshape` 分发 KV Cache？写出它怎么极其恐怖地节约显存！
-- **第二天**：研读 `Pretraining/RoPE/`。**[白板硬装]** 放弃晦涩难懂的虚数公式，只看代码里是怎么用 `sin` 和 `cos` 进行奇偶翻转然后逐元素相乘的！
-- **第三天**：硬啃 `Pretraining/Attention/flashattention.py`。**[灵魂提问]** 为什么它不减反增了计算浮点数，但是速度极其逆天？掌握代码里的 `Online Softmax` （每当找到新的局部 Max 就通过指数差值暴击之前算出老的分母的老底）。
-- **第四天**：组装工厂 `Pretraining/Qwen2_5_Builder/`。了解什么是 `Pre-norm` 为什么一定要把 `norm` 放在残差相加之前？回答为什么 Qwen 要变态地保留 `bias=True`！
+- **第二天**：硬啃 `Pretraining/Attention/mla_deepseek.py`。**[地狱必考题]** 25年大厂面试必杀：为什么 DeepSeek 能单卡跑到 128k？它的潜变量 ($c_{KV}$) 压缩怎么在节省 90% 显存的情况下，还要把 RoPE （旋转位置编码）给脱钩（Decouple）出来算的？
+- **第三天**：研读 `Pretraining/RoPE/`。**[白板硬装]** 放弃晦涩难懂的虚数公式，只看代码里是怎么用 `sin` 和 `cos` 进行奇偶翻转然后逐元素相乘的！
+- **第四天**：硬啃 `Pretraining/Attention/flashattention.py`。**[灵魂提问]** 为什么它不减反增了计算浮点数，但是速度极其逆天？掌握代码里的 `Online Softmax` （每当找到新的局部 Max 就通过指数差值暴击之前算出老的分母的老底）。
+- **第五天**：组装工厂 `Pretraining/Qwen2_5_Builder/`。了解什么是 `Pre-norm` 为什么一定要把 `norm` 放在残差相加之前？回答为什么 Qwen 要变态地保留 `bias=True`！
 
 ### 🟡 阶段二：打磨期 (微调对齐与平民卡极限利用)
 **目标岗**：微调工程师 (SFT Engineer) / 开源模型魔改熟手
@@ -30,8 +31,9 @@
 ### 🔴 阶段四：基建与炼钢 (推理之王与分布式大杀器)
 **目标岗**：大模型架构师 (Infra Engineer / HPC Engineer / Serving Architect)
 **学习重点**：解决能跑得起来跟“如何飞起来并不崩盘”之间的质变。
-- **第九天**：死磕 `Inference_Serving/PagedAttention/`。**[灵魂提问]** 什么是 External Fragmentation 外部碎片化？页表（Page Table）是怎么把离散的显存放进去的？
-- **第十天**：领略分布式的变态神话 `Distributed_Parallel/` (ZeRO / TP / Pipeline / DDP)。**[白板硬装]** 默写 Megatron 的 Tensor Parallel 是怎么切 Column 切 Row，证明它们相乘不串台？ZeRO-1、2、3 到底剥削了哪一层的 120GB 的巨额 Adam 优化器参数？
+- **第十天**：死磕 `Inference_Serving/PagedAttention/`。**[灵魂提问]** 什么是 External Fragmentation 外部碎片化？页表（Page Table）是怎么把离散的显存放进去的？
+- **第十一天**：研究 `Inference_Serving/Speculative_Decoding/`。**[绝杀提问]** 被大厂问到 “在极低的算力利用率下，如何打破 Memory Bandwidth 内存墙提升出词字数？” 拿出投机采样双模型 Draft-Verify 策略，解释为何并行校验 5 个词的时间等于只输出 1 个词的时间。
+- **第十二天**：领略分布式的变态神话 `Distributed_Parallel/` (ZeRO / TP / Pipeline / DDP)。**[白板硬装]** 默写 Megatron 的 Tensor Parallel 是怎么切 Column 切 Row，证明它们相乘不串台？ZeRO-1、2、3 到底剥削了哪一层的 120GB 的巨额 Adam 优化器参数？
 
 ### 🟣 阶段五：造物主 (SWE 智能体与未来系统操控)
 **目标岗**：多智能体研发架构师 (AI Web Agent/SWE-Agent DevOps)
