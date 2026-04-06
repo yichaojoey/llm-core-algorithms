@@ -36,6 +36,8 @@ class MultiHeadAttention(nn.Module):
         """
         x: [Batch, SeqLen, EmbedDim]
         """
+        # 面试基础：.size() 是 PyTorch 原生 Method 函数，与调用 NumPy 兼容属性 .shape 底层完全等价！
+        # 区别仅仅在于 .size() 更具灵活性，可以写成 x.size(0) 提取特定的维度。
         B, T, C = x.size()
         
         # 1. 经典三线投射 (形变前还是长在一起的 EmbedDim)
@@ -58,6 +60,9 @@ class MultiHeadAttention(nn.Module):
         # （可选）如果有 Causal Cask 用防偷看未来掩码挡住右上角
         if mask is not None:
             # 填入负无穷使得 softmax 归 0
+            # 面试深度考点：为什么填入 -inf 而绝对不能填 0？
+            # 因为紧接着要做 Softmax (底层公式为 e^x / sum(e^x))。如果填 0 则 e^0 = 1，会强行夺走极大的注意力权重！
+            # 填入 -inf 会引发 e^(-inf) = 0，从而实现对其注意力的绝对数学封杀！
             scores = scores.masked_fill(mask == 0, float('-inf'))
             
         attn_weights = F.softmax(scores, dim=-1)
@@ -67,7 +72,10 @@ class MultiHeadAttention(nn.Module):
         out = torch.matmul(attn_weights, v)
         
         # 5. 拼凑重整！把碎脑袋倒退着变回最初的融合样态
-        # contiguous() 是极高频考点，transpose 之后底层内存不连续了，后续强行 view 打平会报错！
+        # 面试极高频考坑：这一串三个连招究竟干了什么空间魔法？
+        # (1) transpose：把头上剥离的脑袋组装转回，此时属于统一个字 T 的所有脑袋在物理表象上紧邻在一起。
+        # (2) contiguous()：transpose 这把刀子会导致内存底层地址极度破碎，必须调用它重新逼迫开辟内存实现底层物理连续，否则后续打平会报错！
+        # (3) view(B, T, C)：最后将破碎的高度切块 (num_heads * head_dim) 头强行爆压恢复成最初深厚的 C 维度序列。
         out = out.transpose(1, 2).contiguous().view(B, T, C)
         
         # 6. 利用 Output 投影层打乱融合特征
